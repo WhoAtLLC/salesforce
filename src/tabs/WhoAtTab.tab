@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Who@ Web Dashboard - Access Who@ functionality including incoming requests and reading responses to your requests.</description>
+    <frameHeight>600</frameHeight>
+    <hasSidebar>false</hasSidebar>
+    <label>Who@</label>
+    <mobileReady>false</mobileReady>
+    <motif>Custom99: CRT TV</motif>
+    <url>https://whoat.net?token={!User.WhoAtToken__c}</url>
+    <urlEncodingKey>UTF-8</urlEncodingKey>
+</CustomTab>

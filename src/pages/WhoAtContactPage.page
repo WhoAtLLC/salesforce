@@ -1,0 +1,352 @@
+<!--
+Page for adding Who@ contacts to the account page
+
+Note:  There is a funky url below for dynamically reading images.  The weird url was selected
+based on this article:  
+http://boards.developerforce.com/t5/General-Development/Dynamic-changing-Static-Resource-Name/td-p/342915
+-->
+<apex:page standardController="Account" extensions="WhoAtWebAccountExtension" action="{!initSession}">
+   <apex:pageBlock id="searchPage" >
+       <apex:form >
+		   <apex:image url="{!$Resource.WhoAtLogo}" />
+           <h3 class="search-page-title">Search '{!account.name}' </h3>
+	       <apex:commandButton value="Logout" action="{!doLogout}" rerender="searchPage" style="float:right;"/>
+           <apex:outputText styleClass="search-page-header-username" value="{!labelUsername}" rendered="{!displayUsername}" />
+       </apex:form>
+       <apex:form >
+         <apex:pageBlockTable id="searchTable" value="{!ContactList}" var="contact">
+	         <apex:column width="120px" style="align: center;">
+                <apex:commandLink value="Request Intro" action="{!showIntro}" styleClass="btn" style="color:black;text-decoration:none" 
+                 	rendered="{!or(contact.inCompany, contact.inGroups, contact.inFriends)}" >
+	          	  <apex:param name="currentContact" value="{!contact.id}" assignTo="{!currentContactID}" />
+	          	</apex:commandLink>
+                <apex:commandLink value="Contact Details" action="{!showIntro}" styleClass="btn" style="color:black;text-decoration:none" 
+                    rendered="{!and(contact.inPhone, not(contact.inCompany), not(contact.inGroups), not(contact.inFriends))}" >
+	          	  <apex:param name="currentContact" value="{!contact.id}" assignTo="{!currentContactID}" />
+	          	</apex:commandLink>
+	         </apex:column>
+	         <apex:column value="{!contact.label}" headerValue="Name"/>
+	         <apex:column value="{!contact.title}" headerValue="Title"/>
+	         <apex:column value="{!contact.organization}" headerValue="Company"/>
+	         <apex:column headerClass="sourceColumn" styleClass="sourceColumn">
+		         <apex:facet name="header">
+		         	<apex:image url="{!$Resource[myPhoneImageName]}" />
+		         </apex:facet>
+				 <apex:image rendered="{!contact.inPhone}" url="{!$Resource.BlueCheck}" />
+                 {!contact.PhoneSourceCount}
+             </apex:column>
+	         <apex:column headerClass="sourceColumn" style="color:#0B5185;text-align:center">
+		         <apex:facet name="header">
+		         	<apex:image url="{!$Resource[companyImageName]}" />
+		         </apex:facet>
+				 <apex:image rendered="{!contact.inCompany}" url="{!$Resource.BlueCheck}" />
+	          	{!contact.CompanySourceCount}
+             </apex:column>
+	         <apex:column headerClass="sourceColumn" style="color:#0B5185;text-align:center">
+		         <apex:facet name="header">
+		         	<apex:image url="{!$Resource[groupImageName]}" />
+		         </apex:facet>
+				 <apex:image rendered="{!contact.inGroups}" url="{!$Resource.BlueCheck}" />
+	          	{!contact.GroupsSourceCount}
+             </apex:column>
+	         <apex:column headerClass="sourceColumn" style="color:#0B5185;text-align:center">
+		         <apex:facet name="header">
+		         	<apex:image url="{!$Resource[friendsImageName]}" />
+		         </apex:facet>
+				 <apex:image rendered="{!contact.inFriends}" url="{!$Resource.BlueCheck}" />
+	          	{!contact.FriendsSourceCount}
+             </apex:column>
+
+          </apex:pageBlockTable>
+       	  <apex:pageBlockSection columns="1" id="nothing-here-table" rendered="{!displayNoResultsMsg}" >
+              <apex:pageBlockSectionItem >
+              </apex:pageBlockSectionItem>
+              <apex:pageBlockSectionItem >
+		          <apex:outputText styleClass="search-page-no-results" value="No Search Results Found for '{!account.name}'" />
+              </apex:pageBlockSectionItem>
+           </apex:pageBlockSection>
+	  </apex:form>
+
+      <apex:outputPanel id="intropopup">
+        <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!displayIntro}"/>
+        	<apex:form >
+              <apex:outputPanel styleClass="custPopup" layout="block" rendered="{!displayIntro}">
+		        <div id="intro-request-options">
+		        	<div id="modal-request-header">
+		        		<ul>
+		        			<li>Target</li>
+		        			<li>Select Networks The Request is Sent To</li>
+		        		</ul>
+		        	</div>
+                    <hr />
+                    <div id="mobile-request-target">
+                        <div id="target-info">
+                            <ul>
+                                <li>{!currentContact.label}</li>
+                                <li>{!currentContact.title}</li>
+                                <li>{!currentContact.organization}</li>
+                            </ul>
+                            <hr />
+                            <apex:dataList value="{!currentContact.contactDetailList}" var="item">
+                                <apex:outputText value="{!item}"/>
+                            </apex:dataList>
+                        </div>
+                        <div id="select-networks">
+                            <ul>
+                                <li id="network-work2" class="check-li">
+                                    <apex:commandLink action="{!toggleIntroCompanyIcon}" reRender="intropopup">
+                                    	<img src="{!$Resource[introCompanyImageName]}" alt="Work"/>
+                                    </apex:commandLink>
+                                    <p>Company</p>
+                                </li>
+                                <li id="network-groups2" class="check-li">
+                                    <apex:commandLink action="{!toggleIntroGroupIcon}" reRender="intropopup">
+	                                    <img src="{!$Resource[introGroupImageName]}" alt="Groups"/>
+                                    </apex:commandLink>
+                                    <p>Groups</p>
+                                </li>
+                                <li id="network-friends2">
+                                    <apex:commandLink action="{!toggleIntroFriendsIcon}" reRender="intropopup">
+	                                    <img src="{!$Resource[introFriendsImageName]}" alt="Friends" title="not available yet"/>
+                                    </apex:commandLink>
+                                    <p>Friends</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <apex:outputPanel id="intro-request-message" rendered="{!not(displayMyContact)}" >
+	                    <hr />
+                        <h1>Message</h1>
+                            <div id="the-request-textarea">
+				                <apex:inputTextarea id="Message" cols="100" rows="3"
+                					value="{!currentIntroMessage}" /><br/>
+                            </div>
+                        	<apex:pagemessages />
+                            <div id="modal-request-cancel">
+	                            <apex:commandLink value="Cancel" action="{!closeIntro}" rerender="searchTable,intropopup"/>
+                            </div>
+                            <div id="modal-request-button">
+                                <apex:commandButton value="Send Request" action="{!requestIntro}" 
+                                	rerender="searchTable,intropopup" disabled="{!requestIntroDisabled}"/>
+                            </div>
+                    </apex:outputPanel>
+                    <apex:outputPanel id="intro-request-my-contact" rendered="{!displayMyContact}" >
+	                    <hr />
+                        	<apex:pagemessages />    
+                            <div id="modal-request-cancel">
+	                            <apex:commandLink value="Close" action="{!closeIntro}" rerender="searchTable,intropopup"/>
+                            </div>
+                    </apex:outputPanel>
+                  </div>  
+	          </apex:outputPanel>
+            </apex:form>
+      </apex:outputPanel>
+
+	  <apex:outputPanel id="popupLogin">
+        <apex:outputPanel styleClass="popupBackground" layout="block" rendered="{!displayLogin}"/>
+        <apex:outputPanel styleClass="custLoginPopup" layout="block" rendered="{!displayLogin}">
+        		<apex:form >
+                    <apex:actionFunction name="doLoginAF" action="{!doLogin}" />
+        			<apex:pageBlock title="Please Login">
+        				<apex:pageBlockSection columns="1" collapsible="false">
+					   		<apex:inputText value="{!Username}" label="Username" size="34" onkeypress="return noenter(event);" />
+					   		<apex:inputSecret value="{!Password}" label="Password" size="34" onkeypress="return noenter(event);" />
+                            <apex:pagemessages />
+                            <apex:outputLink value="javascript:goWhoatTab()" onclick="javascript:goWhoatTab()" target="_top"> Need to register? </apex:outputLink>
+					   	</apex:pageBlockSection>
+					   	<apex:pageBlockButtons location="bottom">
+			                <apex:commandButton value="Login" action="{!doLogin}" rerender="searchPage"/>
+			                <apex:commandButton value="Cancel" action="{!closeLogin}" rerender="searchPage"/>
+		                </apex:pageBlockButtons>
+	                </apex:pageBlock>
+            	</apex:form>
+        </apex:outputPanel>
+      </apex:outputPanel>
+       
+   </apex:pageBlock>
+    
+   <style type="text/css">
+        .custPopup{
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 20%;
+            padding:10px;
+            position: absolute;
+            /* These are the 3 css properties you will need to change so the popup 
+            displays in the center of the screen. First set the width. Then set 
+            margin-left to negative half of what the width is. You can add 
+            the height property for a fixed size pop up if you want.*/
+            width: 60%;
+            top:20px;
+        }
+        .popupBackground{
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+        .custLoginPopup{
+            background-color: white;
+            border-width: 2px;
+            border-style: solid;
+            z-index: 9999;
+            left: 50%;
+            padding:10px;
+            position: absolute;
+            /* These are the 3 css properties you will need to change so the popup 
+            displays in the center of the screen. First set the width. Then set 
+            margin-left to negative half of what the width is. You can add 
+            the height property for a fixed size pop up if you want.*/
+            width: 400px;
+            margin-left: -200px;
+            top:35px;
+        }
+       .sourceColumn {
+           color: #0B5185;
+           text-align: center;
+       }
+
+		ol, ul, li {
+			margin: 0;
+			padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+		}
+		ol, ul {
+			list-style: none;
+		}
+
+		.search-page-title {
+            position: relative;
+       		left: 6px;
+       		top: -16px;
+       		font-size: 1.2em;
+        }
+		.search-page-header-username {
+            padding-top: 6px;
+            padding-right: 10px;
+            float: right;
+       		font-size: 1em;
+        }
+        #nothing-here-table .data2Col {
+       		padding-top: 15px;
+        }
+		.search-page-no-results {
+       		padding-top: 15px;
+       		font-weight: bold;
+       		font-size: 1em;
+        }
+        #intro-request-options hr {
+            position: relative;
+            height: 1px;
+            background: #dee3e3;
+            border: none;
+            clear: both;
+            z-index: 3;
+        }
+		#modal-request-header ul > li {
+          margin: 0 0 10px 0;
+          padding: 0;
+          height: auto;
+          font-size: 1em;
+        }
+        #modal-request-header li:first-child {
+          width: 20%;
+          float: left;
+          text-align: left;
+        }
+        #modal-request-header li:last-child {
+          width: 80%;
+          float: right;
+          text-align: right;
+        }       
+		#modal-request-target {
+       		background: red;
+       		padding: 10px 0;
+        }
+		#target-info {
+       		margin-bottom: 10px;
+       		width: 50%;
+       		float: left;
+        }
+		#target-info ul > li {
+            float: none;
+            width: auto;
+		}
+		#select-networks {
+			float: right;
+		}
+		#select-networks ul > li {
+            float: left;
+            margin: 0 0 20px 0;
+            padding: 10px 0 0 0;
+            width: 60px;
+            height: 50px;
+            font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
+            font-size: 0.625em;
+            text-align: center;
+            color: #666;
+        }
+		#select-networks ul > li p {
+			padding: 10px 0;
+		}
+       	#Message {
+       		padding: 5px;
+       	}
+		#modal-request-cancel {
+            float: left;
+            margin-top: 10px;
+        }
+		#modal-request-button {
+            float: right;
+            margin-top: 10px;
+        }
+    </style>
+
+    <script type='text/javascript'>
+	function noenter(ev)  {
+	   	if (window.event && window.event.keyCode == 13 || ev.which == 13) {
+	   		doLoginAF();
+	       	return false;
+	     } else {
+	          return true;
+	     }
+	 }
+	</script>
+    
+    <script type="text/javascript">
+        var __sfdcSessionId = '{!GETSESSIONID()}';
+    </script>
+    <script src="../../soap/ajax/25.0/connection.js" type="text/javascript"></script>
+    <script type="text/javascript">     
+        var whoat_tab_url = '';
+        window.onload = function() 
+        {
+            whoat_tab_url = '{!URLFOR($Action.Account.New)}';
+            var result = sforce.connection.describeTabs();
+            for (var i=0; i<result.length; i++) 
+            {
+                var tabSet = result[i].get("tabs");
+                for(var j=0; j<tabSet.length; j++) 
+                {
+                    var tab = tabSet[j];
+                    if(tab.label == "Who@")
+                        whoat_tab_url=tab.url;
+                }
+            }
+        }
+        var goWhoatTab = function()
+        {
+            window.parent.location = whoat_tab_url;
+        }
+    </script> 
+</apex:page>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>APIToken</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>APIToken</value>
+    </caseValues>
+    <fields>
+        <label><!-- token --></label>
+        <name>token__c</name>
+    </fields>
+    <fields>
+        <help><!-- This is the User&apos;s Who@ Username --></help>
+        <label><!-- username --></label>
+        <name>username__c</name>
+    </fields>
+    <startsWith>Consonant</startsWith>
+</CustomObjectTranslation>

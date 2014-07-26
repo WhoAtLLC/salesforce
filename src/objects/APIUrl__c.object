@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <customSettingsVisibility>Protected</customSettingsVisibility>
+    <description>The URL to access for Who@ API requests</description>
+    <enableFeeds>false</enableFeeds>
+    <fields>
+        <fullName>url__c</fullName>
+        <defaultValue>&quot;https://whoat.net/api/v1&quot;</defaultValue>
+        <deprecated>false</deprecated>
+        <description>The URL to access for Who@ API requests</description>
+        <externalId>false</externalId>
+        <inlineHelpText>Set this to the Who@ API endpoint.</inlineHelpText>
+        <label>url</label>
+        <length>250</length>
+        <required>true</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <label>APIUrl</label>
+</CustomObject>
