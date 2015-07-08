@@ -9,8 +9,12 @@ http://boards.developerforce.com/t5/General-Development/Dynamic-changing-Static-
    <apex:pageBlock id="searchPage" >
        <apex:form >
 		   <apex:image url="{!$Resource.WhoAtLogo}" />
-           <h3 class="search-page-title">Search '{!account.name}' </h3>
-	       <apex:commandButton value="Logout" action="{!doLogout}" rerender="searchPage" style="float:right;"/>
+           <h3 class="search-page-title">Search {!account.name}
+              <span class="separator-header">Filter:</span> 
+              <apex:inputText value="{!search_token}" alt="Search account name" />
+              <apex:commandButton value="Search" action="{!doSearch}" reRender="searchPage" styleClass="separator-header" />
+           </h3>
+           <apex:commandButton value="Logout" action="{!doLogout}" rerender="searchPage" style="float:right;"/>
            <apex:outputText styleClass="search-page-header-username" value="{!labelUsername}" rendered="{!displayUsername}" />
        </apex:form>
        <apex:form >
@@ -240,6 +244,13 @@ http://boards.developerforce.com/t5/General-Development/Dynamic-changing-Static-
         #nothing-here-table .data2Col {
        		padding-top: 15px;
         }
+    .separator-header {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+    .separator-header:before {
+      content: "-&nbsp;&nbsp;";
+    }
 		.search-page-no-results {
        		padding-top: 15px;
        		font-weight: bold;

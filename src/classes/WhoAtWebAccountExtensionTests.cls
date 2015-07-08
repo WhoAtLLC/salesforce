@@ -17,6 +17,7 @@ public class WhoAtWebAccountExtensionTests{
         insert a;
         
         Test.setMock(HttpCalloutMock.class, new MockWhoAtWebAPIAccountExtension());
+        
         ApexPages.StandardController sc = new ApexPages.standardController(a);
         WhoAtWebAccountExtension e = new WhoAtWebAccountExtension(sc);
 
@@ -92,4 +93,47 @@ public class WhoAtWebAccountExtensionTests{
         System.assert(true);
     }
 
+    private static testMethod void test_privateNormalizationSearchToken(){
+        setupTests();
+
+        Account a = new Account(Name='Tester');
+        insert a;
+
+        Test.setMock(HttpCalloutMock.class, new MockWhoAtWebAPIAccountExtension());
+        ApexPages.StandardController stdCtrl = new ApexPages.StandardController(a);
+        WhoAtWebAccountExtension ctrl = new WhoAtWebAccountExtension(stdCtrl);
+
+        Test.startTest();
+        ctrl.initSession();
+
+        System.assertEquals('', ctrl.normalizeToken(null));
+        System.assertEquals('-Test', ctrl.normalizeToken('-Test'));
+        System.assertEquals('+test', ctrl.normalizeToken('+test'));
+        System.assertEquals('+/test', ctrl.normalizeToken('/test'));
+        System.assertEquals('+test', ctrl.normalizeToken('   test\n'));
+
+        Test.stopTest();
+    }
+
+    private static testMethod void test_doSearch(){
+        setupTests();
+
+        Account a = new Account(Name='Tester');
+        insert a;
+
+        Test.setMock(HttpCalloutMock.class, new MockWhoAtWebAPIAccountExtension());
+        ApexPages.StandardController stdCtrl = new ApexPages.StandardController(a);
+        WhoAtWebAccountExtension ctrl = new WhoAtWebAccountExtension(stdCtrl);
+
+        Test.startTest();
+        ctrl.initSession();
+        ctrl.currentContactID = 'M4DE_MDVA_2_V5QH';
+        ctrl.showIntro();
+       
+        ctrl.search_token = '+test';
+        ctrl.doSearch();
+        Test.stopTest();
+
+        System.assert(true);
+    }
 }
