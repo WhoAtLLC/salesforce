@@ -102,7 +102,7 @@ public with sharing class WhoAtWebAccountExtension{
     public void initSession() {
         try {
             search_token = '';
-            api.search(this.acct.name);
+            api.search(EncodingUtil.urlEncode(this.acct.name,'UTF-8'));
             turnOnOffRelationshipSourceIcons();
             labelUsername = api.username;
             setDisplayFlags('GoodSearchResults');
@@ -155,7 +155,7 @@ public with sharing class WhoAtWebAccountExtension{
     public void doLogin() {
         try {
             api.login(Username, Password);
-            api.search(this.acct.name);
+            api.search(EncodingUtil.urlEncode(this.acct.name,'UTF-8'));
 
             turnOnOffRelationshipSourceIcons();
 
@@ -175,7 +175,7 @@ public with sharing class WhoAtWebAccountExtension{
     }
 
     public void doSearch(){
-        String search_expr = this.acct.name + '%20' + normalizeToken(search_token);
+        String search_expr = EncodingUtil.urlEncode(this.acct.name,'UTF-8') + '%20' + normalizeToken(search_token);
 
         try {
             //Search with filter
