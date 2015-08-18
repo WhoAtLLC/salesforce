@@ -141,7 +141,8 @@ public with sharing class WhoAtWebAPI{
         Http h = new Http();
         HttpRequest req = new HttpRequest();
 
-        String encodedQuery = EncodingUtil.urlEncode(query,'UTF-8');
+        // String encodedQuery = EncodingUtil.urlEncode(query,'UTF-8');
+        String encodedQuery = query;
         String[] params = new String[] {
             apiURL,
             encodedQuery,
